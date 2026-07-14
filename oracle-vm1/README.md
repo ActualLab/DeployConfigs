@@ -1,7 +1,8 @@
 # oracle-vm1
 
-Shared configuration for the Oracle Cloud A1 VM (`161.153.30.140`, hostname
-`vnic-primary`) that hosts several ActualLab sample apps behind Cloudflare.
+Shared configuration for the Oracle Cloud A1 VM (hostname `vnic-primary`) that
+hosts several ActualLab sample apps behind Cloudflare. Its origin IP is not
+published here — the sites are reached via their Cloudflare-proxied hostnames.
 
 ## What runs here
 
