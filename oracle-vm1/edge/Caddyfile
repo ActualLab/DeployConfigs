@@ -1,0 +1,41 @@
+# Shared edge for oracle-vm1. Caddy sits behind Cloudflare (proxied / "orange
+# cloud") and terminates TLS using a Cloudflare Origin CA certificate; Cloudflare's
+# SSL/TLS mode is Full. The wildcard Origin cert (*.actuallab.net) covers every
+# subdomain, so no ACME is performed. Caddy still runs the automatic HTTP (:80) ->
+# HTTPS (:443) redirect, which Cloudflare relays.
+#
+# Each app container joins the external "edge" network and is reached by its
+# container name. WebSockets (Fusion RPC + Blazor Server) and SSE (the Fusion MCP
+# StreamableHTTP endpoint) are reverse-proxied transparently.
+#
+# To add a site: add a block here, commit, and let the edge-deploy timer apply it.
+
+(tls_and_encode) {
+	tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin.key
+	encode zstd gzip
+}
+
+boardgames.actuallab.net {
+	import tls_and_encode
+	reverse_proxy boardgames-app:8080
+}
+
+todoapp.actuallab.net {
+	import tls_and_encode
+	reverse_proxy todoapp-app:8080
+}
+
+blazor-samples.actuallab.net {
+	import tls_and_encode
+	reverse_proxy blazor-app:8080
+}
+
+townhall.actuallab.net {
+	import tls_and_encode
+	reverse_proxy townhall-app:8080
+}
+
+fusion.actuallab.net {
+	import tls_and_encode
+	reverse_proxy fusion-app:8080
+}

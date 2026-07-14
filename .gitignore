@@ -1,0 +1,4 @@
+# Host-managed secrets — never commit these. They are placed on the VM by hand.
+**/certs/*.pem
+**/certs/*.key
+**/.env

@@ -1,0 +1,41 @@
+# Shared edge reverse proxy for oracle-vm1. This is the single container that owns
+# ports 80/443 on the host: it terminates TLS with the Cloudflare wildcard Origin
+# cert (*.actuallab.net) and reverse-proxies each subdomain to its app container.
+#
+# Every app stack on this host (boardgames, townhall, fusion-samples, fusion)
+# joins the external "edge" network and is reached by its container name; this
+# proxy is the only thing that publishes ports. Previously this service lived
+# inside the BoardGames deployment; it now lives here so no single app owns the
+# shared edge.
+#
+# Usage on the host:
+#   cd /opt/apps/deploy-configs/oracle-vm1/edge
+#   docker compose -f docker-compose.prod.yml up -d
+name: edge
+
+services:
+  edge-caddy:
+    image: caddy:2-alpine
+    container_name: edge-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/etc/caddy/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - edge
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  # Shared, externally-created network. Create once with: docker network create edge
+  # Every app stack references it the same way (external: true, name: edge).
+  edge:
+    external: true
+    name: edge

@@ -1,0 +1,4 @@
+# The TLS origin cert/key live here on the host and are git-ignored:
+#   origin.pem  — Cloudflare Origin CA certificate for *.actuallab.net
+#   origin.key  — its private key (mode 600)
+# Place them on the VM by hand; they are never committed.
