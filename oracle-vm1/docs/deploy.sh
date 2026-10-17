@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Poll-based auto-deploy for the Voxt documentation. Invoked by docs-deploy.timer,
 # but can also be run by hand. Redeploys when the docs branch moves, or when this
-# folder's Dockerfile/compose file changes (edge-deploy.timer pulls those).
+# folder's compose file changes (edge-deploy.timer pulls it).
 # A failed build leaves the previous container serving and is not retried until
 # the next change or --force, so a broken commit doesn't rebuild every minute.
 set -euo pipefail
@@ -17,7 +17,7 @@ cd "$REPO_DIR"
 
 git fetch --quiet origin "$BRANCH"
 REMOTE="$(git rev-parse "origin/$BRANCH")"
-STAMP="$REMOTE $(cat "$HERE/Dockerfile" "$COMPOSE_FILE" | sha1sum | cut -d' ' -f1)"
+STAMP="$REMOTE $(sha1sum < "$COMPOSE_FILE" | cut -d' ' -f1)"
 
 if [[ "${1:-}" != "--force" ]]; then
     [[ "$(cat "$STAMP_FILE" 2>/dev/null)" == "$STAMP" ]] && exit 0

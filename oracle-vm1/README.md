@@ -58,8 +58,9 @@ The timer polls `origin/main` every minute and re-applies the edge stack
 
 ## Voxt documentation (`docs/`)
 
-Unlike the apps, the docs repo is private and carries no deploy files, so its stack
-lives here. The VM clones it over SSH with a read-only deploy key:
+The docs repo is private; it builds its own image (`mcp-server/Dockerfile`: the site
+at `/`, the documentation MCP server at `/mcp`), and its compose file, deploy script
+and timer live here. The VM clones it over SSH with a read-only deploy key:
 
 ```bash
 ssh-keygen -t ed25519 -N '' -C oracle-vm1-docs -f ~/.ssh/docs_deploy  # add the .pub as a deploy key on Actual-Chat/docs
@@ -76,8 +77,8 @@ sudo cp docs/systemd/docs-deploy.* /etc/systemd/system/
 sudo systemctl daemon-reload && sudo systemctl enable --now docs-deploy.timer
 ```
 
-`docs/deploy.sh` redeploys when the docs branch moves, or when `docs/Dockerfile` or
-`docs/docker-compose.prod.yml` change.
+`docs/deploy.sh` redeploys when the docs branch moves, or when
+`docs/docker-compose.prod.yml` changes.
 
 ## Migrating the edge out of BoardGames (one-time)
 
