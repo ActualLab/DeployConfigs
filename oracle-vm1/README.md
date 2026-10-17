@@ -13,6 +13,7 @@ published here — the sites are reached via their Cloudflare-proxied hostnames.
 | `blazor-samples.actuallab.net` | `blazor-app` | ActualLab/Fusion.Samples |
 | `townhall.actuallab.net` | `townhall-app` | ActualLab/Fusion.TownHall |
 | `fusion.actuallab.net` | `fusion-app` | ActualLab/Fusion (docs + MCP) |
+| not routed yet | `docs-app` | Actual-Chat/docs (private), deployed from [`docs/`](docs/) |
 
 All app containers publish no ports; they join the shared external **`edge`**
 network and are reached by container name. The only thing that owns ports 80/443
@@ -54,6 +55,29 @@ sudo systemctl enable --now edge-deploy.timer
 The timer polls `origin/main` every minute and re-applies the edge stack
 (recreating `edge-caddy` when the Caddyfile changes). Force now:
 `edge/deploy.sh --force`.
+
+## Voxt documentation (`docs/`)
+
+Unlike the apps, the docs repo is private and carries no deploy files, so its stack
+lives here. The VM clones it over SSH with a read-only deploy key:
+
+```bash
+ssh-keygen -t ed25519 -N '' -C oracle-vm1-docs -f ~/.ssh/docs_deploy  # add the .pub as a deploy key on Actual-Chat/docs
+cat >> ~/.ssh/config <<'EOF'
+Host github-docs
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/docs_deploy
+  IdentitiesOnly yes
+EOF
+sudo apt-get install -y git-lfs && git lfs install --skip-repo
+git clone git@github-docs:actual-chat/docs.git /opt/apps/docs  # full clone: the build needs the history
+sudo cp docs/systemd/docs-deploy.* /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now docs-deploy.timer
+```
+
+`docs/deploy.sh` redeploys when the docs branch moves, or when `docs/Dockerfile` or
+`docs/docker-compose.prod.yml` change.
 
 ## Migrating the edge out of BoardGames (one-time)
 
