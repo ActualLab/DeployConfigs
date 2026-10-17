@@ -1,8 +1,11 @@
 # Shared edge for oracle-vm1. Caddy sits behind Cloudflare (proxied / "orange
 # cloud") and terminates TLS using a Cloudflare Origin CA certificate; Cloudflare's
 # SSL/TLS mode is Full. The wildcard Origin cert (*.actuallab.net) covers every
-# subdomain, so no ACME is performed. Caddy still runs the automatic HTTP (:80) ->
-# HTTPS (:443) redirect, which Cloudflare relays.
+# subdomain, so no ACME is performed for them. Caddy still runs the automatic HTTP
+# (:80) -> HTTPS (:443) redirect, which Cloudflare relays.
+#
+# The exception is docs.voxt.ai: its DNS is in Google Cloud DNS, not Cloudflare,
+# so it points straight at this VM and Caddy gets its certificate via ACME.
 #
 # Each app container joins the external "edge" network and is reached by its
 # container name. WebSockets (Fusion RPC + Blazor Server) and SSE (the Fusion MCP
@@ -38,4 +41,9 @@ townhall.actuallab.net {
 fusion.actuallab.net {
 	import tls_and_encode
 	reverse_proxy fusion-app:8080
+}
+
+docs.voxt.ai {
+	encode zstd gzip
+	reverse_proxy docs-app:8080
 }

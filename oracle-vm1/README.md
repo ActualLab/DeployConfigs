@@ -13,7 +13,7 @@ published here — the sites are reached via their Cloudflare-proxied hostnames.
 | `blazor-samples.actuallab.net` | `blazor-app` | ActualLab/Fusion.Samples |
 | `townhall.actuallab.net` | `townhall-app` | ActualLab/Fusion.TownHall |
 | `fusion.actuallab.net` | `fusion-app` | ActualLab/Fusion (docs + MCP) |
-| not routed yet | `docs-app` | Actual-Chat/docs (private), deployed from [`docs/`](docs/) |
+| `docs.voxt.ai` (DNS not on Cloudflare; ACME cert) | `docs-app` | Actual-Chat/docs (private), deployed from [`docs/`](docs/) |
 
 All app containers publish no ports; they join the shared external **`edge`**
 network and are reached by container name. The only thing that owns ports 80/443
