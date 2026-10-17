@@ -21,7 +21,11 @@ STAMP="$REMOTE $(cat "$HERE/Dockerfile" "$COMPOSE_FILE" | sha1sum | cut -d' ' -f
 
 if [[ "${1:-}" != "--force" ]]; then
     [[ "$(cat "$STAMP_FILE" 2>/dev/null)" == "$STAMP" ]] && exit 0
-    [[ "$(cat "$FAILED_FILE" 2>/dev/null)" == "$STAMP" ]] && exit 0
+    # Keep the unit failed (visible in systemctl --failed) without rebuilding
+    if [[ "$(cat "$FAILED_FILE" 2>/dev/null)" == "$STAMP" ]]; then
+        echo "Still failing at $REMOTE; push a fix or run with --force." >&2
+        exit 1
+    fi
 fi
 
 echo "$(date -u +%FT%TZ) Deploying $REMOTE (was $(git rev-parse HEAD))"
