@@ -1,0 +1,24 @@
+# Voxt documentation (Actual-Chat/docs) on oracle-vm1, reached by the shared edge
+# Caddy as docs-app:8080. Built from the private docs clone in /opt/apps/docs,
+# which the VM pulls with a read-only deploy key (SSH host alias "github-docs").
+#
+# Usage on the host:
+#   docker compose -f /opt/apps/deploy-configs/oracle-vm1/docs/docker-compose.prod.yml up -d --build
+name: docs
+
+services:
+  docs-app:
+    build:
+      context: /opt/apps/docs
+      dockerfile: /opt/apps/deploy-configs/oracle-vm1/docs/Dockerfile
+    container_name: docs-app
+    restart: unless-stopped
+    expose:
+      - "8080"
+    networks:
+      - edge
+
+networks:
+  edge:
+    external: true
+    name: edge
